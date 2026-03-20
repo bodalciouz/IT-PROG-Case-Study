@@ -29,13 +29,13 @@ function checkRole($requiredRoleID){
 function redirectToDashboard($role_id){
     switch($role_id){
         case 1:
-            header("Location: /admin/dashboard.php");
+            header("Location: admin/dashboard.php");
             break;
         case 2:
-            header("Location: /staff/dashboard.php");
+            header("Location: staff/dashboard.php");
             break;
         case 3:
-            header("Location: /patients/dashboard.php");
+            header("Location: patients/dashboard.php");
             break;
         default:
             header("Location: /login.php");
