@@ -1,47 +1,44 @@
 <?php
 session_start();
 require_once "config/database.php";
+require_once __DIR__ . '/includes/functions.php';
 
 $error = "";
 $success = "";
 
 if(isset($_POST["register"])){
 
-    $first_name = $_POST["first_name"];
-    $last_name = $_POST["last_name"];
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $confirm_password = $_POST["confirm_password"];
-    $contact = $_POST["contact"];
-    $address = $_POST["address"];
+    $first_name = sanitizeInput($_POST["first_name"] ?? '');
+    $last_name = sanitizeInput($_POST["last_name"] ?? '');
+    $email = sanitizeInput($_POST["email"] ?? '');
+    $password = $_POST["password"] ?? '';
+    $confirm_password = $_POST["confirm_password"] ?? '';
+    $contact = sanitizeInput($_POST["contact"] ?? '');
+    $address = sanitizeInput($_POST["address"] ?? '');
 
     if(empty($first_name) || empty($last_name) || empty($email) || empty($password)){
         $error = "All required fields must be filled.";
-    }
-    elseif($password != $confirm_password){
+    }elseif ($password != $confirm_password){
         $error = "Passwords do not match.";
-    }
-    else{
+    }else{
+        $email = mysqli_real_escape_string($conn, $email);
 
         $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
 
         if(mysqli_num_rows($check) > 0){
             $error = "Email already exists.";
-        }
-        else{
-
+        }else{
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $role_id = 3;
 
             $insert = "INSERT INTO users 
-            (role_id, first_name, last_name, email, password, contact_number, address)
-            VALUES 
-            ('$role_id', '$first_name', '$last_name', '$email', '$hashed_password', '$contact', '$address')";
+                (role_id, first_name, last_name, email, password, contact_number, address)
+                VALUES 
+                ('$role_id', '$first_name', '$last_name', '$email', '$hashed_password', '$contact', '$address')";
 
             if(mysqli_query($conn, $insert)){
                 $success = "Registration successful! You can now login.";
-            }
-            else{
+            }else{
                 $error = "Error: " . mysqli_error($conn);
             }
         }
@@ -57,27 +54,23 @@ if(isset($_POST["register"])){
 <title>SmartClinic - Register</title>
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class="register-page">
 
 <div class="container">
 
-    <div class="login-section">
+    <section class="login-section">
         <p class="welcome-text">WELCOME</p>
         <h1>Create your account</h1>
 
         <?php if(!empty($error)): ?>
-            <p style="color:#ff6b6b; font-weight:600; margin-bottom:10px;">
-                <?php echo $error; ?>
-            </p>
+            <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
         <?php endif; ?>
 
         <?php if(!empty($success)): ?>
-            <p style="color:#4ab8b8; font-weight:600; margin-bottom:10px;">
-                <?php echo $success; ?>
-            </p>
+            <p class="success-message"><?php echo htmlspecialchars($success); ?></p>
         <?php endif; ?>
 
-        <form class="login-form" method="POST">
+        <form class="login-form" method="POST" autocomplete="off">
 
             <div class="form-group">
                 <label>First Name</label>
@@ -120,18 +113,14 @@ if(isset($_POST["register"])){
                 Already have an account? <a href="login.php">Login</a>
             </p>
         </form>
-    </div>
+    </section>
 
-    <div class="brand-section">
-        <div class="logo-container">
-            <img src="assets/images/login_logo.svg" alt="SmartClinic Logo" class="brand-logo">
-        </div>
-
+    <section class="brand-section">
         <div class="brand-text">
             <h2 class="brand-name">SmartClinic</h2>
             <p class="brand-subtitle">Clinic Appointment System</p>
         </div>
-    </div>
+    </section>
 
 </div>
 
