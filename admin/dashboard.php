@@ -1,17 +1,10 @@
 <?php
-session_start();
-include '../config/database.php'; // DB connection
-include '../includes/authorization.php'; // For authentication
+require_once '../includes/authorization.php';
+requireLogin();
+checkRole(1);
 
+require_once '../config/database.php';
 
-
-if(!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
-    header("Location: ../login.php");
-    exit();
-}
-
-
-// Fetch summary data
 $result = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role_id = 3");
 $total_patients = $result->fetch_assoc()['total'];
 
@@ -21,7 +14,7 @@ $total_staff = $result->fetch_assoc()['total'];
 $result = $conn->query("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = CURDATE()");
 $appointments_today = $result->fetch_assoc()['total'];
 
-$result = $conn->query("SELECT COUNT(*) AS total FROM queue WHERE status='pending' OR status='ongoing'");
+$result = $conn->query("SELECT COUNT(*) AS total FROM queue WHERE status IN ('pending', 'ongoing')");
 $queue_today = $result->fetch_assoc()['total'];
 ?>
 
@@ -29,55 +22,88 @@ $queue_today = $result->fetch_assoc()['total'];
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - SmartClinic</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
-<div class="container">
-    <!-- Sidebar / Info Section -->
-    <div class="login-section">
-        <h1>Admin Dashboard</h1>
-        <p class="welcome-text">Welcome, Admin!</p>
 
-        <div class="login-form">
-            <div class="form-group">
-                <label>Total Patients</label>
-                <input type="text" value="<?php echo $total_patients; ?>" readonly>
-            </div>
+<div class="app-container">
 
-            <div class="form-group">
-                <label>Total Staff</label>
-                <input type="text" value="<?php echo $total_staff; ?>" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Appointments Today</label>
-                <input type="text" value="<?php echo $appointments_today; ?>" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Patients in Queue</label>
-                <input type="text" value="<?php echo $queue_today; ?>" readonly>
-            </div>
-
-            <div class="form-options">
-                <a href="manage_users.php" class="login-btn">Manage Users</a>
-                <a href="manage_services.php" class="login-btn">Manage Services</a>
-                <a href="reports.php" class="login-btn">Reports</a>
-                <a href="../logout.php" class="login-btn">Logout</a>
-            </div>
+    <aside class="sidebar">
+        <div class="logo">
+            <h1>SmartClinic</h1>
+            <span>Admin Panel</span>
         </div>
-    </div>
 
-    <!-- Brand Section -->
-    <div class="brand-section">
-        <div class="brand-text">
-            <h2 class="brand-name">SmartClinic</h2>
-            <h3 class="brand-subtitle">Admin Panel</h3>
-            <p class="brand-tagline">Streamline appointments & monitor queues</p>
+        <nav class="menu">
+            <a href="dashboard.php" class="nav-item active">Dashboard</a>
+            <a href="manage_users.php" class="nav-item">Manage Users</a>
+            <a href="manage_services.php" class="nav-item">Manage Services</a>
+            <a href="reports.php" class="nav-item">Reports</a>
+        </nav>
+
+        <div class="logout">
+            <a href="../logout.php" class="nav-item">Logout</a>
         </div>
-    </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h2>Welcome, Admin</h2>
+        </header>
+
+        <section class="dashboard">
+            <div class="dashboard-header">
+                <h3>Admin Dashboard</h3>
+                <p>Monitor clinic activity and manage core system records</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="label">Total Patients</span>
+                        <span class="value"><?= $total_patients; ?></span>
+                        <span class="subtext">Registered patient accounts</span>
+                    </div>
+                    <div class="icon-box blue"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="label">Total Staff</span>
+                        <span class="value"><?= $total_staff; ?></span>
+                        <span class="subtext">Registered staff accounts</span>
+                    </div>
+                    <div class="icon-box green"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="label">Appointments Today</span>
+                        <span class="value"><?= $appointments_today; ?></span>
+                        <span class="subtext">Scheduled for today</span>
+                    </div>
+                    <div class="icon-box blue"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <span class="label">Active Queue</span>
+                        <span class="value"><?= $queue_today; ?></span>
+                        <span class="subtext">Pending or ongoing queue</span>
+                    </div>
+                    <div class="icon-box green"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
+    </main>
+
 </div>
+
 </body>
 </html>
-
