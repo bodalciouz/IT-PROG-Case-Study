@@ -38,25 +38,6 @@ $result = $conn->query("SELECT * FROM schedules WHERE user_id = $user_id ORDER B
 <title>Manage Schedule</title>
 <link rel="stylesheet" href="../assets/css/styles.css">
 
-<style>
-select {
-    padding: 15px 20px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    font-size: 15px;
-}
-
-.schedule-card {
-    background: white;
-    color: black;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-</style>
-
 </head>
 <body>
 
