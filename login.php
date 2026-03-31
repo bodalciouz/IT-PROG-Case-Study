@@ -32,7 +32,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 $_SESSION['role_id'] = $role_id;
 
                 redirectToDashboard($role_id);
-
             }else{
                 $error = "Incorrect password.";
             }
@@ -56,55 +55,45 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body>
+<body class="login-page">
 
 <div class="container">
 
-<div class="login-section">
+    <section class="login-section">
+        <p class="welcome-text">WELCOME BACK</p>
+        <h1>Sign in to your account</h1>
 
-<p class="welcome-text">WELCOME BACK</p>
-<h1>Sign in to your account</h1>
+        <?php if(!empty($error)): ?>
+            <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
+        <?php endif; ?>
 
-<?php if(!empty($error)): ?>
-<p style="color:#ff6b6b;font-weight:600;margin-bottom:10px;">
-<?php echo $error; ?>
-</p>
-<?php endif; ?>
+        <form class="login-form" method="POST" autocomplete="off">
 
-<form class="login-form" method="POST">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Enter Email" required>
+            </div>
 
-<div class="form-group">
-<label>Email</label>
-<input type="email" name="email" placeholder="Enter Email" required>
-</div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter Password" required>
+            </div>
 
-<div class="form-group">
-<label>Password</label>
-<input type="password" name="password" placeholder="Enter Password" required>
-</div>
+            <button type="submit" class="login-btn">Log In</button>
 
-<button type="submit" class="login-btn">Log In</button>
+            <p class="signup-text">
+                New User? <a href="register.php">Sign up</a>
+            </p>
 
-<p class="signup-text">
-New User? <a href="register.php">Sign up</a>
-</p>
+        </form>
+    </section>
 
-</form>
-
-</div>
-
-<div class="brand-section">
-
-<div class="logo-container">
-<img src="assets/images/login_logo.svg" alt="SmartClinic Logo" style="width:150px;">
-</div>
-
-<div class="brand-text">
-<h2 class="brand-name">SmartClinic</h2>
-<p class="brand-subtitle">Clinic Appointment System</p>
-</div>
-
-</div>
+    <section class="brand-section">
+        <div class="brand-text">
+            <h2 class="brand-name">SmartClinic</h2>
+            <p class="brand-subtitle">Clinic Appointment System</p>
+        </div>
+    </section>
 
 </div>
 
