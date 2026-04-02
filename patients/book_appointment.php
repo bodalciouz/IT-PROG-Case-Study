@@ -96,48 +96,6 @@ $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment - SmartClinic</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <style>
-        select {
-            width: 100%;
-            background-color: #ffffff;
-            color: #222222;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-        }
-        select:focus {
-            outline: none;
-            border-color: #4a90e2;
-            background-color: #f9f9f9;
-            color: #222222;
-        }
-        option {
-            background-color: #ffffff;
-            color: #222222;
-            padding: 8px;
-        }
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-weight: 500;
-        }
-        .alert.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
 </head>
 <body class="dashboard-page">
 

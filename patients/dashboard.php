@@ -32,73 +32,6 @@ $current_time = date("h:i A");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard - SmartClinic</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <style>
-        /* Custom styles for healthcare dashboard */
-        .dashboard-header {
-            text-align: center;
-            padding: 20px;
-            background-color: #f0f8ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            justify-content: space-between;
-        }
-
-        .stat-card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .stat-info {
-            margin-bottom: 15px;
-        }
-
-        .stat-info .label {
-            font-size: 14px;
-            color: #777;
-        }
-
-        .stat-info .value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .appointment-card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
-        .appointment-list {
-            margin-top: 10px;
-            list-style: none;
-            padding: 0;
-        }
-
-        .appointment-list li {
-            background-color: #f4f9fb;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .appointment-list li .details {
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
 
@@ -129,7 +62,7 @@ $current_time = date("h:i A");
             <h2>Welcome to Your Dashboard</h2>
         </header>
 
-        <section class="dashboard">
+        <section class="patient-dashboard">
             <div class="dashboard-header">
                 <h3>Healthcare Dashboard</h3>
                 <p>Monitor your appointments, upcoming consultations, and take control of your healthcare.</p>
