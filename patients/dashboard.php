@@ -4,26 +4,101 @@ requireLogin();
 checkRole(3);
 require_once '../config/database.php';
 
+// Set the timezone to Philippine Standard Time (Asia/Manila)
+date_default_timezone_set('Asia/Manila');
+
 $user_id = $_SESSION['user_id'];
 
-$query = "SELECT first_name, last_name FROM users WHERE user_id = $user_id";
-$result = mysqli_query($conn, $query);
-$user = mysqli_fetch_assoc($result);
+// Fetch upcoming appointments (excluding cancelled ones)
+$appointments_query = $conn->query("SELECT appointment_id, appointment_date, appointment_time, service_id, status FROM appointments WHERE patient_id=$user_id AND appointment_date > CURDATE() AND status != 'cancelled' ORDER BY appointment_date LIMIT 3");
+$upcoming_appointments = [];
+while ($row = mysqli_fetch_assoc($appointments_query)) {
+    $service_query = "SELECT service_name FROM services WHERE service_id = " . $row['service_id'];
+    $service_result = mysqli_query($conn, $service_query);
+    $service = mysqli_fetch_assoc($service_result);
+    $row['service_name'] = $service['service_name'];
+    $upcoming_appointments[] = $row;
+}
 
-$appointments_today_query = $conn->query("SELECT COUNT(*) AS total FROM appointments WHERE patient_id=$user_id AND appointment_date=CURDATE()");
-$appointments_today = $appointments_today_query->fetch_assoc()['total'];
-
-$pending_queue_query = $conn->query("SELECT COUNT(*) AS total FROM queue q JOIN appointments a ON q.appointment_id=a.appointment_id WHERE a.patient_id=$user_id AND q.status='pending'");
-$pending_queue = $pending_queue_query->fetch_assoc()['total'];
+// Get current date and time for display
+$current_date = date("l, F j, Y");
+$current_time = date("h:i A");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patient Dashboard - SmartClinic</title>
-<link rel="stylesheet" href="../assets/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - SmartClinic</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        /* Custom styles for healthcare dashboard */
+        .dashboard-header {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .stat-card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .stat-info {
+            margin-bottom: 15px;
+        }
+
+        .stat-info .label {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .stat-info .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .appointment-card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .appointment-list {
+            margin-top: 10px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .appointment-list li {
+            background-color: #f4f9fb;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .appointment-list li .details {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
@@ -51,34 +126,43 @@ $pending_queue = $pending_queue_query->fetch_assoc()['total'];
 
     <main class="main-content">
         <header class="top-bar">
-            <h2>Welcome, <?= htmlspecialchars($user['first_name']); ?></h2>
+            <h2>Welcome to Your Dashboard</h2>
         </header>
 
         <section class="dashboard">
             <div class="dashboard-header">
-                <h3>Patient Dashboard</h3>
-                <p>Manage your appointments and monitor your queue status easily</p>
+                <h3>Healthcare Dashboard</h3>
+                <p>Monitor your appointments, upcoming consultations, and take control of your healthcare.</p>
             </div>
 
+            <!-- Date and Time Section -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-info">
-                        <span class="label">Appointments Today</span>
-                        <span class="value"><?= $appointments_today ?></span>
-                        <span class="subtext">Scheduled for today</span>
+                        <span class="label">Today's Date</span>
+                        <span class="value"><?= $current_date ?></span>
                     </div>
-                    <div class="icon-box blue"></div>
-                </div>
-
-                <div class="stat-card">
                     <div class="stat-info">
-                        <span class="label">Pending Queue</span>
-                        <span class="value"><?= $pending_queue ?></span>
-                        <span class="subtext">Waiting for consultation</span>
+                        <span class="label">Current Time</span>
+                        <span class="value"><?= $current_time ?></span>
                     </div>
-                    <div class="icon-box green"></div>
                 </div>
             </div>
+
+            <!-- Upcoming Appointments Section -->
+            <div class="appointment-card">
+                <h4>Upcoming Appointments</h4>
+                <ul class="appointment-list">
+                    <?php foreach ($upcoming_appointments as $appointment): ?>
+                        <li>
+                            <div class="details">
+                                <?= htmlspecialchars($appointment['service_name']) ?> - <?= date('M j, Y', strtotime($appointment['appointment_date'])) ?> at <?= date('g:i A', strtotime($appointment['appointment_time'])) ?>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
         </section>
 
         <footer class="footer">
