@@ -674,6 +674,17 @@ body.dashboard-page{
     text-align: left;
 }
 
+.styled-table input,
+.styled-table select,
+.styled-table textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: #222;
+    background: #fff;
+}
+
 
 @media(max-width: 1024px){
     .admin-table{

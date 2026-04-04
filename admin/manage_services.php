@@ -19,7 +19,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_service'])) {
         header("Location: manage_services.php");
         exit();
     } else {
-        $message = "<p style='color:red;'>Error adding service.</p>";
+        $message = "<p style='color:red;'>Error adding service. Service name may already exist.</p>";
+    }
+}
+
+/* UPDATE SERVICE */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_service'])) {
+    $service_id = (int) $_POST['service_id'];
+    $name = trim($_POST['service_name']);
+    $desc = trim($_POST['description']);
+    $duration = (int) $_POST['estimated_duration'];
+
+    $stmt = $conn->prepare("UPDATE services SET service_name = ?, description = ?, estimated_duration = ? WHERE service_id = ?");
+    $stmt->bind_param("ssii", $name, $desc, $duration, $service_id);
+
+    if ($stmt->execute()) {
+        header("Location: manage_services.php");
+        exit();
+    } else {
+        $message = "<p style='color:red;'>Error updating service.</p>";
     }
 }
 
@@ -38,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_service'])) {
     }
 }
 
-/* FETCH SERVICES */
 $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
 ?>
 
@@ -50,11 +67,9 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
     <title>Manage Services - SmartClinic</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-
 <body class="dashboard-page admin-page">
 
 <div class="app-container">
-
     <aside class="sidebar">
         <div class="logo">
             <h1>SmartClinic</h1>
@@ -62,9 +77,11 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
         </div>
 
         <nav class="menu">
-            <a href="dashboard.php" class="nav-item active">Dashboard</a>
+            <a href="dashboard.php" class="nav-item">Dashboard</a>
             <a href="manage_users.php" class="nav-item">Manage Users</a>
-            <a href="manage_services.php" class="nav-item">Manage Services</a>
+            <a href="manage_services.php" class="nav-item active">Manage Services</a>
+            <a href="manage_appointments.php" class="nav-item">Appointments</a>
+            <a href="queue_overview.php" class="nav-item">Queue Overview</a>
             <a href="reports.php" class="nav-item">Reports</a>
         </nav>
 
@@ -76,9 +93,8 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
     <main class="main-content">
         <h2>Manage Services</h2>
 
-        <section class="content-card">
+        <div class="content-card">
             <h3>Add Service</h3>
-
             <?= $message ?>
 
             <form method="POST" class="crud-form">
@@ -89,7 +105,7 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea name="description" id="description" rows="4"></textarea>
+                    <textarea name="description" id="description" rows="3"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -99,9 +115,9 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
 
                 <button type="submit" name="add_service" class="btn-primary">Add Service</button>
             </form>
-        </section>
+        </div>
 
-        <section class="content-card">
+        <div class="content-card">
             <h3>All Services</h3>
 
             <table class="styled-table">
@@ -111,29 +127,40 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
                         <th>Service Name</th>
                         <th>Description</th>
                         <th>Duration</th>
-                        <th>Actions</th>
+                        <th>Update</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($row = $services->fetch_assoc()): ?>
                         <tr>
-                            <td><?= $row['service_id'] ?></td>
-                            <td><?= htmlspecialchars($row['service_name']) ?></td>
-                            <td><?= htmlspecialchars($row['description']) ?></td>
-                            <td><?= $row['estimated_duration'] ?> mins</td>
-                            <td>
-                                <form method="POST" onsubmit="return confirm('Delete this service?');">
+                            <form method="POST">
+                                <td>
+                                    <?= $row['service_id'] ?>
                                     <input type="hidden" name="service_id" value="<?= $row['service_id'] ?>">
-                                    <button type="submit" name="delete_service" class="btn-danger">Delete</button>
-                                </form>
-                            </td>
+                                </td>
+                                <td>
+                                    <input type="text" name="service_name" value="<?= htmlspecialchars($row['service_name']) ?>" required>
+                                </td>
+                                <td>
+                                    <textarea name="description" rows="2"><?= htmlspecialchars($row['description']) ?></textarea>
+                                </td>
+                                <td>
+                                    <input type="number" name="estimated_duration" value="<?= $row['estimated_duration'] ?>" min="1" required>
+                                </td>
+                                <td>
+                                    <button type="submit" name="update_service" class="btn-primary">Update</button>
+                                </td>
+                                <td>
+                                    <button type="submit" name="delete_service" class="btn-danger" onclick="return confirm('Delete this service?');">Delete</button>
+                                </td>
+                            </form>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
-        </section>
+        </div>
     </main>
-
 </div>
 
 </body>

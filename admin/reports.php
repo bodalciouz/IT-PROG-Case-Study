@@ -4,40 +4,83 @@ requireLogin();
 checkRole(1);
 require_once '../config/database.php';
 
-$totals = [
-    'appointments_today' => 0,
-    'completed_today' => 0,
-    'missed_today' => 0,
-    'pending_queue' => 0,
-    'total_patients' => 0,
-];
+$date_from = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-01');
+$date_to   = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-d');
 
-$queries = [
-    'appointments_today' => "SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = CURDATE()",
-    'completed_today' => "SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = CURDATE() AND status = 'completed'",
-    'missed_today' => "SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = CURDATE() AND status = 'missed'",
-    'pending_queue' => "SELECT COUNT(*) AS total FROM queue WHERE status IN ('pending','ongoing')",
-    'total_patients' => "SELECT COUNT(*) AS total FROM users WHERE role_id = 3"
-];
+$total_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM appointments
+    WHERE appointment_date BETWEEN ? AND ?
+");
+$total_stmt->bind_param("ss", $date_from, $date_to);
+$total_stmt->execute();
+$total_appointments = $total_stmt->get_result()->fetch_assoc()['total'];
 
-foreach ($queries as $key => $sql) {
-    $result = $conn->query($sql);
-    if ($result) {
-        $totals[$key] = (int)$result->fetch_assoc()['total'];
-    }
-}
+$completed_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM appointments
+    WHERE appointment_date BETWEEN ? AND ?
+    AND status = 'completed'
+");
+$completed_stmt->bind_param("ss", $date_from, $date_to);
+$completed_stmt->execute();
+$completed = $completed_stmt->get_result()->fetch_assoc()['total'];
 
-$service_stats = $conn->query("SELECT s.service_name, COUNT(a.appointment_id) AS total_appointments
-FROM services s
-LEFT JOIN appointments a ON s.service_id = a.service_id
-GROUP BY s.service_id, s.service_name
-ORDER BY total_appointments DESC, s.service_name ASC");
+$missed_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM appointments
+    WHERE appointment_date BETWEEN ? AND ?
+    AND status = 'missed'
+");
+$missed_stmt->bind_param("ss", $date_from, $date_to);
+$missed_stmt->execute();
+$missed = $missed_stmt->get_result()->fetch_assoc()['total'];
 
-$status_stats = $conn->query("SELECT status, COUNT(*) AS total
-FROM appointments
-GROUP BY status
-ORDER BY total DESC, status ASC");
+$cancelled_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM appointments
+    WHERE appointment_date BETWEEN ? AND ?
+    AND status = 'cancelled'
+");
+$cancelled_stmt->bind_param("ss", $date_from, $date_to);
+$cancelled_stmt->execute();
+$cancelled = $cancelled_stmt->get_result()->fetch_assoc()['total'];
+
+$pending_queue_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM queue q
+    JOIN appointments a ON q.appointment_id = a.appointment_id
+    WHERE a.appointment_date BETWEEN ? AND ?
+    AND q.status IN ('pending', 'ongoing')
+");
+$pending_queue_stmt->bind_param("ss", $date_from, $date_to);
+$pending_queue_stmt->execute();
+$pending_queue = $pending_queue_stmt->get_result()->fetch_assoc()['total'];
+
+$service_report_stmt = $conn->prepare("
+    SELECT s.service_name, COUNT(*) AS total
+    FROM appointments a
+    JOIN services s ON a.service_id = s.service_id
+    WHERE a.appointment_date BETWEEN ? AND ?
+    GROUP BY s.service_id, s.service_name
+    ORDER BY total DESC
+");
+$service_report_stmt->bind_param("ss", $date_from, $date_to);
+$service_report_stmt->execute();
+$service_report = $service_report_stmt->get_result();
+
+$status_report_stmt = $conn->prepare("
+    SELECT status, COUNT(*) AS total
+    FROM appointments
+    WHERE appointment_date BETWEEN ? AND ?
+    GROUP BY status
+    ORDER BY total DESC
+");
+$status_report_stmt->bind_param("ss", $date_from, $date_to);
+$status_report_stmt->execute();
+$status_report = $status_report_stmt->get_result();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,72 +89,132 @@ ORDER BY total DESC, status ASC");
     <title>Reports - SmartClinic</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body>
+<body class="dashboard-page admin-page">
+
 <div class="app-container">
     <aside class="sidebar">
-        <div class="logo"><h1>SmartClinic</h1><span>Admin Panel</span></div>
+        <div class="logo">
+            <h1>SmartClinic</h1>
+            <span>Admin Panel</span>
+        </div>
+
         <nav class="menu">
             <a href="dashboard.php" class="nav-item">Dashboard</a>
             <a href="manage_users.php" class="nav-item">Manage Users</a>
             <a href="manage_services.php" class="nav-item">Manage Services</a>
+            <a href="manage_appointments.php" class="nav-item">Appointments</a>
+            <a href="queue_overview.php" class="nav-item">Queue Overview</a>
             <a href="reports.php" class="nav-item active">Reports</a>
         </nav>
-        <div class="logout"><a href="../logout.php" class="nav-item">Logout</a></div>
+
+        <div class="logout">
+            <a href="../logout.php" class="nav-item">Logout</a>
+        </div>
     </aside>
 
     <main class="main-content">
-        <header class="top-bar"><h2>Reports</h2></header>
-        <section class="dashboard">
-            <div class="dashboard-header">
-                <h3>Clinic Operations Report</h3>
-                <p>View daily statistics and appointment trends from the current system data.</p>
-            </div>
+        <h2>Operational Reports</h2>
 
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-info"><span class="label">Appointments Today</span><span class="value"><?= $totals['appointments_today'] ?></span><span class="subtext">Booked for today</span></div><div class="icon-box blue">📅</div></div>
-                <div class="stat-card"><div class="stat-info"><span class="label">Completed Today</span><span class="value"><?= $totals['completed_today'] ?></span><span class="subtext">Finished consultations</span></div><div class="icon-box green">✅</div></div>
-                <div class="stat-card"><div class="stat-info"><span class="label">Missed Today</span><span class="value"><?= $totals['missed_today'] ?></span><span class="subtext">No-show appointments</span></div><div class="icon-box blue">⚠️</div></div>
-                <div class="stat-card"><div class="stat-info"><span class="label">Active Queue</span><span class="value"><?= $totals['pending_queue'] ?></span><span class="subtext">Pending or ongoing</span></div><div class="icon-box green">⏳</div></div>
-            </div>
-
-            <div class="report-grid">
-                <div class="content-card">
-                    <h3 class="section-title">Appointments per Service</h3>
-                    <div class="table-wrapper">
-                        <table class="data-table simple-table">
-                            <thead><tr><th>Service</th><th>Total Appointments</th></tr></thead>
-                            <tbody>
-                            <?php while ($row = $service_stats->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($row['service_name']) ?></td>
-                                    <td><?= (int)$row['total_appointments'] ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="content-card">
+            <h3>Filter Report Range</h3>
+            <form method="GET" class="crud-form">
+                <div class="form-group">
+                    <label for="date_from">From</label>
+                    <input type="date" name="date_from" id="date_from" value="<?= htmlspecialchars($date_from) ?>" required>
                 </div>
 
-                <div class="content-card">
-                    <h3 class="section-title">Appointment Status Summary</h3>
-                    <div class="table-wrapper">
-                        <table class="data-table simple-table">
-                            <thead><tr><th>Status</th><th>Total</th></tr></thead>
-                            <tbody>
-                            <?php while ($row = $status_stats->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars(ucfirst($row['status'])) ?></td>
-                                    <td><?= (int)$row['total'] ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="form-group">
+                    <label for="date_to">To</label>
+                    <input type="date" name="date_to" id="date_to" value="<?= htmlspecialchars($date_to) ?>" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Generate</button>
+            </form>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="label">Total Appointments</span>
+                    <span class="value"><?= $total_appointments ?></span>
+                    <span class="subtext">Within selected range</span>
                 </div>
             </div>
-        </section>
-        <footer class="footer">SmartClinic © 2026. All Rights Reserved</footer>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="label">Completed</span>
+                    <span class="value"><?= $completed ?></span>
+                    <span class="subtext">Finished consultations</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="label">Missed</span>
+                    <span class="value"><?= $missed ?></span>
+                    <span class="subtext">Not served</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="label">Cancelled</span>
+                    <span class="value"><?= $cancelled ?></span>
+                    <span class="subtext">Cancelled bookings</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="label">Active Queue</span>
+                    <span class="value"><?= $pending_queue ?></span>
+                    <span class="subtext">Pending or ongoing</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h3>Appointments per Service</h3>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Total Appointments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $service_report->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['service_name']) ?></td>
+                            <td><?= $row['total'] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-card">
+            <h3>Appointments by Status</h3>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $status_report->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= ucfirst($row['status']) ?></td>
+                            <td><?= $row['total'] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     </main>
 </div>
+
 </body>
 </html>
