@@ -5,27 +5,25 @@ checkRole(2);
 
 require_once '../config/database.php';
 
-// UPDATE QUEUE STATUS
 if(isset($_POST['update_queue'])){
     $queue_id = $_POST['queue_id'];
     $status = $_POST['status'];
 
-    // update queue table
     $stmt = $conn->prepare("UPDATE queue SET status=? WHERE queue_id=?");
     $stmt->bind_param("si", $status, $queue_id);
     $stmt->execute();
 
-    // sync appointment status
-    $conn->query("
+    $stmt2 = $conn->prepare("
         UPDATE appointments 
-        SET status='$status'
+        SET status=? 
         WHERE appointment_id = (
-            SELECT appointment_id FROM queue WHERE queue_id = $queue_id
+            SELECT appointment_id FROM queue WHERE queue_id=?
         )
     ");
+    $stmt2->bind_param("si", $status, $queue_id);
+    $stmt2->execute();
 }
 
-// FETCH QUEUE
 $query = "
 SELECT q.*, u.first_name, u.last_name, s.estimated_duration
 FROM queue q
@@ -36,35 +34,84 @@ ORDER BY q.queue_number ASC
 ";
 
 $result = $conn->query($query);
-
 $current_position = 1;
 ?>
 
-<h2>Queue Management</h2>
+<body class="dashboard-page">
 
-<?php while($row = $result->fetch_assoc()): ?>
+<div class="app-container">
 
-<?php
-$estimated_wait = ($row['queue_number'] - $current_position) * $row['estimated_duration'];
-?>
+<div class="sidebar">
+    <div class="logo">
+        <h1>SmartClinic</h1>
+        <span>Staff Panel</span>
+    </div>
 
-<div style="border:1px solid #ccc; padding:10px; margin:10px;">
-    <p>
-        Queue #<?= $row['queue_number'] ?> |
-        <?= $row['first_name'] ?> <?= $row['last_name'] ?> |
-        Status: <?= $row['status'] ?> |
-        Est Wait: <?= $estimated_wait ?> mins
-    </p>
+    <div class="menu">
+        <a href="dashboard.php" class="nav-item">Dashboard</a>
+        <a href="manage_schedule.php" class="nav-item">Manage Schedule</a>
+        <a href="manage_appointments.php" class="nav-item">Appointments</a>
+        <a href="manage_queue.php" class="nav-item active">Queue</a>
+    </div>
 
-    <form method="POST">
-        <input type="hidden" name="queue_id" value="<?= $row['queue_id'] ?>">
-
-        <button name="status" value="ongoing">Start</button>
-        <button name="status" value="completed">Complete</button>
-        <button name="status" value="missed">Miss</button>
-
-        <input type="hidden" name="update_queue" value="1">
-    </form>
+    <div class="logout">
+        <a href="../logout.php" class="nav-item">Logout</a>
+    </div>
 </div>
 
-<?php endwhile; ?>
+<div class="main-content">
+
+<div class="top-bar">
+    <h2>Queue Management</h2>
+</div>
+
+<div class="dashboard">
+
+<div class="content-card">
+    <h3 class="section-title">Queue List</h3>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Queue #</th>
+                    <th>Patient</th>
+                    <th>Status</th>
+                    <th>Est Wait</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            <?php while($row = $result->fetch_assoc()): 
+                $estimated_wait = ($row['queue_number'] - $current_position) * $row['estimated_duration'];
+            ?>
+                <tr>
+                    <td><?= $row['queue_number'] ?></td>
+                    <td><?= $row['first_name'] ?> <?= $row['last_name'] ?></td>
+                    <td><?= $row['status'] ?></td>
+                    <td><?= $estimated_wait ?> mins</td>
+
+                    <td class="action-cell">
+                        <form method="POST">
+                            <input type="hidden" name="queue_id" value="<?= $row['queue_id'] ?>">
+
+                            <button class="table-btn" name="status" value="ongoing">Start</button>
+                            <button class="table-btn" name="status" value="completed">Complete</button>
+                            <button class="table-btn danger-btn" name="status" value="missed">Miss</button>
+
+                            <input type="hidden" name="update_queue" value="1">
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</body>
