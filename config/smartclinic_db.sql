@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 01, 2026 at 08:28 PM
+-- Host: 127.0.0.1:3307
+-- Generation Time: Apr 04, 2026 at 05:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -37,6 +37,15 @@ CREATE TABLE `appointments` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Creation date'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `appointment_date`, `appointment_time`, `status`, `created_at`) VALUES
+(34, 17, 4, '2026-04-06', '23:12:00', 'completed', '2026-04-04 15:12:49'),
+(35, 17, 3, '2026-04-07', '13:16:00', 'missed', '2026-04-04 15:16:24'),
+(36, 18, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:17:40');
+
 -- --------------------------------------------------------
 
 --
@@ -52,6 +61,15 @@ CREATE TABLE `notifications` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Record creation date'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`notification_id`, `user_id`, `appointment_id`, `type`, `message`, `created_at`) VALUES
+(10, 17, 34, '', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:12:49'),
+(11, 17, 35, '', 'Your appointment request for Digital Mammography on April 7, 2026 at 1:16 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:16:24'),
+(12, 18, 36, '', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:17:40');
+
 -- --------------------------------------------------------
 
 --
@@ -66,6 +84,15 @@ CREATE TABLE `queue` (
   `estimated_wait` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Estimated waiting time in minutes',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Queue record creation date'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `queue`
+--
+
+INSERT INTO `queue` (`queue_id`, `appointment_id`, `queue_number`, `status`, `estimated_wait`, `created_at`) VALUES
+(12, 34, 1, 'completed', 60, '2026-04-04 15:12:49'),
+(13, 35, 1, 'missed', 45, '2026-04-04 15:16:24'),
+(14, 36, 2, 'pending', 120, '2026-04-04 15:17:40');
 
 -- --------------------------------------------------------
 
@@ -108,7 +135,8 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `user_id`, `day_of_week`, `start_time`, `end_time`, `max_patients`, `created_at`) VALUES
-(1, 7, 'Monday', '09:00:00', '17:00:00', 10, '2026-03-31 07:40:26');
+(1, 7, 'Monday', '09:00:00', '17:00:00', 10, '2026-03-31 07:40:26'),
+(2, 7, 'Friday', '15:18:00', '23:23:00', 12, '2026-04-04 15:18:39');
 
 -- --------------------------------------------------------
 
@@ -143,7 +171,7 @@ INSERT INTO `services` (`service_id`, `service_name`, `description`, `estimated_
 (13, 'Multi-Specialty Doctors Clinic', 'Multi-Specialty Consultation', 30),
 (14, 'Home Service Ambulatory Care Services', 'Home Service and Ambulatory Care', 60),
 (15, 'Mobile On-Site Services', 'Mobile Medical Services', 45),
-(16, 'Vaccination', 'Vaccination Services', 15);
+(17, 'Vaccination', 'Vaccination Services', 60);
 
 -- --------------------------------------------------------
 
@@ -172,7 +200,9 @@ INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `
 (6, 3, 'Carl', 'Crespo', 'carl_crespo@dlsu.edu.ph', '$2y$10$B.fnhjBo5xThzKh.9IiRH.nRLuDP6z3hEB1pGpSJoE1s8G.aKjT0m', '09668730710', 'Manila', '2026-03-30 08:12:38'),
 (7, 2, 'Staff', 'User', 'staff@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09987654321', 'Clinic Staff Room', '2026-03-30 08:27:02'),
 (14, 3, 'Angelo', 'Benigno', 'oleg@gmail.com', '$2y$10$VGNIyen85QeyzkIBGa4lF.DOmCY.3vvShGQOd79CyNXFpmmI1RyJu', '012345678', 'Caloocan', '2026-03-31 09:41:50'),
-(16, 3, 'ako', 'lang', 'akolangba@gmail.com', '$2y$10$.DxgOTdKJHN.QXpZp6Ax4.yqYPcJjOGb7CyDpa39fbWk/gSoSd5Ti', '0922 727 1919', 'Manila', '2026-04-01 12:25:26');
+(16, 3, 'ako', 'lang', 'akolangba@gmail.com', '$2y$10$.DxgOTdKJHN.QXpZp6Ax4.yqYPcJjOGb7CyDpa39fbWk/gSoSd5Ti', '0922 727 1919', 'Manila', '2026-04-01 12:25:26'),
+(17, 3, 'john', 'doe', 'john@yahoo.com', '$2y$10$NsXoMzFg9n9zg/PwZkNDqOAA4ixXjpox7Nmb35wrEQjamfGrfkvUW', '091241234', 'john house', '2026-04-04 15:11:49'),
+(18, 3, 'jane', 'doe', 'jane@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '', '', '2026-04-04 15:12:05');
 
 --
 -- Indexes for dumped tables
@@ -239,19 +269,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for appointments', AUTO_INCREMENT=34;
+  MODIFY `appointment_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for appointments', AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for notifications', AUTO_INCREMENT=10;
+  MODIFY `notification_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for notifications', AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `queue`
 --
 ALTER TABLE `queue`
-  MODIFY `queue_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for queue', AUTO_INCREMENT=12;
+  MODIFY `queue_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for queue', AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -263,19 +293,19 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for schedules', AUTO_INCREMENT=2;
+  MODIFY `schedule_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for schedules', AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `service_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for services', AUTO_INCREMENT=17;
+  MODIFY `service_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for services', AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for users', AUTO_INCREMENT=17;
+  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for users', AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables

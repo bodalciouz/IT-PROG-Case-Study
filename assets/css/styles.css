@@ -193,6 +193,44 @@ body.dashboard-page{
     box-shadow: 0 5px 20px rgba(95, 207, 207, 0.4);
 }
 
+.update-btn,
+.delete-btn {
+    width: 100%;
+    display: block;
+}
+
+.update-btn,
+.delete-btn {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.update-btn {
+    background: linear-gradient(90deg, #3d8a8a 0%, #5fcfcf 100%);
+}
+
+.delete-btn {
+    background: linear-gradient(90deg, #d9534f 0%, #c9302c 100%);
+}
+
+.update-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(95, 207, 207, 0.4);
+}
+
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(217, 83, 79, 0.4);
+}
+
 .signup-text{
     text-align: center;
     color: white;
@@ -342,8 +380,8 @@ body.dashboard-page{
     background: var(--primary-teal);
     color: white;
     text-align: center;
-    padding: 10px;
-    font-size: 0.8rem;
+    padding: 20px;
+    font-size: 1rem;
 }
 
 @media(max-width: 768px){
