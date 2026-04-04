@@ -87,6 +87,7 @@ if (!empty($filter_date)) {
             <a href="dashboard.php" class="nav-item">Dashboard</a>
             <a href="manage_users.php" class="nav-item">Manage Users</a>
             <a href="manage_services.php" class="nav-item">Manage Services</a>
+            <a href="manage_schedules.php" class="nav-item">Manage Schedules</a>
             <a href="manage_appointments.php" class="nav-item active">Appointments</a>
             <a href="queue_overview.php" class="nav-item">Queue Overview</a>
             <a href="reports.php" class="nav-item">Reports</a>
