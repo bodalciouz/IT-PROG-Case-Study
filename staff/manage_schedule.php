@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../includes/authorization.php';
 requireLogin();
 checkRole(2);
@@ -9,27 +10,69 @@ $user_id = $_SESSION['user_id'];
 $error = "";
 $success = "";
 
-// INSERT SCHEDULE
-if(isset($_POST['add_schedule'])){
-    $day   = $_POST['day_of_week'];
-    $start = $_POST['start_time'];
-    $end   = $_POST['end_time'];
+$clinic_start = '08:00';
+$clinic_end   = '17:00';
+$allowed_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    if($start >= $end){
-        $error = "Invalid time range";
-    } else {
-        $stmt = $conn->prepare("INSERT INTO schedules(user_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?)");
+function isValidDay($day, $allowed_days) {
+    return in_array($day, $allowed_days);
+}
+
+if(isset($_POST['add_schedule'])){
+    $day   = $_POST['day_of_week'] ?? '';
+    $start = $_POST['start_time'] ?? '';
+    $end   = $_POST['end_time'] ?? '';
+
+    if(!$day || !$start || !$end){
+        $error = "All fields are required.";
+    } 
+    elseif(!isValidDay($day, $allowed_days)){
+        $error = "Schedule must be within clinic days: " . implode(", ", $allowed_days);
+    } 
+    elseif(!DateTime::createFromFormat('H:i', $start) || !DateTime::createFromFormat('H:i', $end)){
+        $error = "Invalid time format.";
+    } 
+    elseif($start >= $end){
+        $error = "Start time must be earlier than end time.";
+    } 
+    elseif($start < $clinic_start || $end > $clinic_end){
+        $error = "Schedule must be within clinic hours: $clinic_start - $clinic_end";
+    }
+    else {
+        $stmt = $conn->prepare("
+            SELECT * FROM schedules 
+            WHERE user_id=? AND day_of_week=? 
+            AND NOT (end_time <= ? OR start_time >= ?)
+        ");
         $stmt->bind_param("isss", $user_id, $day, $start, $end);
-        if($stmt->execute()){
-            $success = "Schedule added successfully!";
+        $stmt->execute();
+        $result_overlap = $stmt->get_result();
+
+        if($result_overlap->num_rows > 0){
+            $error = "Schedule overlaps with an existing schedule.";
         } else {
-            $error = "Failed to add schedule: " . htmlspecialchars($stmt->error);
+            $insert_stmt = $conn->prepare("
+                INSERT INTO schedules(user_id, day_of_week, start_time, end_time) 
+                VALUES (?, ?, ?, ?)
+            ");
+            $insert_stmt->bind_param("isss", $user_id, $day, $start, $end);
+            if($insert_stmt->execute()){
+                $success = "Schedule added successfully!";
+            } else {
+                $error = "Failed to add schedule: " . htmlspecialchars($insert_stmt->error);
+            }
+            $insert_stmt->close();
         }
+
         $stmt->close();
     }
 }
 
-$result = $conn->query("SELECT * FROM schedules WHERE user_id=$user_id ORDER BY FIELD(day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')");
+$result = $conn->query("
+    SELECT * FROM schedules 
+    WHERE user_id=$user_id 
+    ORDER BY FIELD(day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'), start_time
+");
 ?>
 
 <!DOCTYPE html>
@@ -58,10 +101,10 @@ $result = $conn->query("SELECT * FROM schedules WHERE user_id=$user_id ORDER BY 
             </div>
 
             <?php if($error): ?>
-                <div class="alert error"><?= $error ?></div>
+                <div class="alert error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
             <?php if($success): ?>
-                <div class="alert success"><?= $success ?></div>
+                <div class="alert success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
 
             <div class="content-card">
@@ -72,24 +115,20 @@ $result = $conn->query("SELECT * FROM schedules WHERE user_id=$user_id ORDER BY 
                         <label>Select Day</label>
                         <select name="day_of_week" required>
                             <option value="" disabled selected>-- Select Day --</option>
-                            <option>Monday</option>
-                            <option>Tuesday</option>
-                            <option>Wednesday</option>
-                            <option>Thursday</option>
-                            <option>Friday</option>
-                            <option>Saturday</option>
-                            <option>Sunday</option>
+                            <?php foreach($allowed_days as $day_option): ?>
+                                <option><?= $day_option ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
                     <div class="form-group-profile">
                         <label>Start Time</label>
-                        <input type="time" name="start_time" required>
+                        <input type="time" name="start_time" required min="<?= $clinic_start ?>" max="<?= $clinic_end ?>">
                     </div>
 
                     <div class="form-group-profile">
                         <label>End Time</label>
-                        <input type="time" name="end_time" required>
+                        <input type="time" name="end_time" required min="<?= $clinic_start ?>" max="<?= $clinic_end ?>">
                     </div>
 
                     <div style="display:flex; gap:10px; margin-top:10px;">
@@ -131,9 +170,9 @@ $result = $conn->query("SELECT * FROM schedules WHERE user_id=$user_id ORDER BY 
 
 </div>
 
-    <footer class="footer">
-        SmartClinic © 2026. All Rights Reserved
-    </footer>
+<footer class="footer">
+    SmartClinic © 2026. All Rights Reserved
+</footer>
 
 </body>
 </html>
