@@ -16,10 +16,13 @@ if(isset($_POST["register"])){
     $contact = sanitizeInput($_POST["contact"] ?? '');
     $address = sanitizeInput($_POST["address"] ?? '');
 
-    if(empty($first_name) || empty($last_name) || empty($email) || empty($password)){
+    if(empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($contact)){
         $error = "All required fields must be filled.";
-    }elseif ($password != $confirm_password){
+    } elseif ($password != $confirm_password){
         $error = "Passwords do not match.";
+    }elseif(strlen($contact) != 11 || substr($contact, 0, 2) != "09" || !ctype_digit($contact))
+    {
+        $error = "Invalid phone number. Must be 11 digits and start with 09.";
     }else{
         $email = mysqli_real_escape_string($conn, $email);
 
@@ -27,7 +30,7 @@ if(isset($_POST["register"])){
 
         if(mysqli_num_rows($check) > 0){
             $error = "Email already exists.";
-        }else{
+        } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $role_id = 3;
 
