@@ -646,6 +646,10 @@ body.dashboard-page{
     margin-top: 20px;
 }
 
+input[type="date"] {
+    color: #333;
+    background-color: #fff;
+}
 
 /* Admin page specific styles */
 
