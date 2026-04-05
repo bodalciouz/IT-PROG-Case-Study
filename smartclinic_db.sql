@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 05, 2026 at 03:33 PM
+-- Generation Time: Apr 05, 2026 at 03:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -230,18 +230,18 @@ INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `
 (3, 1, 'Admin', 'User', 'admin@smartclinic.com', '$2y$10$nn6Kl4bgSlGE4.aNTG3Q0e/GzICwkzEGjsjiwUgpKyiLkPkeusv76', '09123456789', 'Clinic Address', '2026-03-20 14:35:44'),
 (6, 3, 'Carl', 'Crespo', 'carl_crespo@dlsu.edu.ph', '$2y$10$B.fnhjBo5xThzKh.9IiRH.nRLuDP6z3hEB1pGpSJoE1s8G.aKjT0m', '09668730710', 'Manila', '2026-03-30 08:12:38'),
 (7, 2, 'Staff', 'User', 'staff@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09987654321', 'Clinic Staff Room', '2026-03-30 08:27:02'),
-(14, 3, 'Angelo', 'Benigno', 'oleg@gmail.com', '$2y$10$VGNIyen85QeyzkIBGa4lF.DOmCY.3vvShGQOd79CyNXFpmmI1RyJu', '012345678', 'Caloocan', '2026-03-31 09:41:50'),
-(16, 3, 'ako', 'lang', 'akolangba@gmail.com', '$2y$10$.DxgOTdKJHN.QXpZp6Ax4.yqYPcJjOGb7CyDpa39fbWk/gSoSd5Ti', '0922 727 1919', 'Manila', '2026-04-01 12:25:26'),
-(17, 3, 'john', 'doe', 'john@yahoo.com', '$2y$10$NsXoMzFg9n9zg/PwZkNDqOAA4ixXjpox7Nmb35wrEQjamfGrfkvUW', '091241234', 'john house', '2026-04-04 15:11:49'),
-(18, 3, 'jane', 'doe', 'jane@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '', '', '2026-04-04 15:12:05'),
-(19, 2, 'Maria', 'Santos', 'maria.santos@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09170000001', 'Staff Office A', '2026-04-05 09:51:44'),
-(20, 2, 'Paolo', 'Reyes', 'paolo.reyes@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09170000002', 'Staff Office B', '2026-04-05 09:51:44'),
-(21, 3, 'Mark', 'Dela Cruz', 'mark.delacruz@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09181234567', 'Quezon City', '2026-04-05 09:51:44'),
-(22, 3, 'Angela', 'Torres', 'angela.torres@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09182345678', 'Makati City', '2026-04-05 09:51:44'),
-(23, 3, 'Kevin', 'Lim', 'kevin.lim@yahoo.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09183456789', 'Pasig City', '2026-04-05 09:51:44'),
-(24, 3, 'Sofia', 'Navarro', 'sofia.navarro@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09184567890', 'Taguig City', '2026-04-05 09:51:44'),
-(25, 3, 'Luis', 'Garcia', 'luis.garcia@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09185678901', 'Mandaluyong City', '2026-04-05 09:51:44'),
-(26, 3, 'Bea', 'Fernandez', 'bea.fernandez@yahoo.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09186789012', 'San Juan City', '2026-04-05 09:51:44');
+(14, 3, 'Angelo', 'Benigno', 'oleg@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '012345678', 'Caloocan', '2026-03-31 09:41:50'),
+(16, 3, 'ako', 'lang', 'akolangba@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '0922 727 1919', 'Manila', '2026-04-01 12:25:26'),
+(17, 3, 'john', 'doe', 'john@yahoo.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '091241234', 'john house', '2026-04-04 15:11:49'),
+(18, 3, 'jane', 'doe', 'jane@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '', '', '2026-04-04 15:12:05'),
+(19, 2, 'Maria', 'Santos', 'maria.santos@smartclinic.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09170000001', 'Staff Office A', '2026-04-05 09:51:44'),
+(20, 2, 'Paolo', 'Reyes', 'paolo.reyes@smartclinic.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09170000002', 'Staff Office B', '2026-04-05 09:51:44'),
+(21, 3, 'Mark', 'Dela Cruz', 'mark.delacruz@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09181234567', 'Quezon City', '2026-04-05 09:51:44'),
+(22, 3, 'Angela', 'Torres', 'angela.torres@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09182345678', 'Makati City', '2026-04-05 09:51:44'),
+(23, 3, 'Kevin', 'Lim', 'kevin.lim@yahoo.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09183456789', 'Pasig City', '2026-04-05 09:51:44'),
+(24, 3, 'Sofia', 'Navarro', 'sofia.navarro@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09184567890', 'Taguig City', '2026-04-05 09:51:44'),
+(25, 3, 'Luis', 'Garcia', 'luis.garcia@gmail.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09185678901', 'Mandaluyong City', '2026-04-05 09:51:44'),
+(26, 3, 'Bea', 'Fernandez', 'bea.fernandez@yahoo.com', '$2y$10$UZi7TRzRMLhOgJCjCy5d6uEwm7.99dzCulQzqpCg07ck1NUYfyKf.', '09186789012', 'San Juan City', '2026-04-05 09:51:44');
 
 --
 -- Indexes for dumped tables
