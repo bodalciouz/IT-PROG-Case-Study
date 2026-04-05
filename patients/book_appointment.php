@@ -30,12 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $appointment_id = mysqli_insert_id($conn);
         mysqli_stmt_close($stmt);
 
-        // Step 2: Count existing queue entries for that date to determine queue_number
+        // Step 2: Queue based on appointment time  
         $count_result = mysqli_query($conn, "
             SELECT COUNT(*) AS count
             FROM queue q
             JOIN appointments a ON q.appointment_id = a.appointment_id
             WHERE a.appointment_date = '$date'
+            AND (
+                a.appointment_time < '$time'
+                OR (a.appointment_time = '$time' AND a.appointment_id < $appointment_id)
+            )
         ");
         $count_row    = mysqli_fetch_assoc($count_result);
         $queue_number = (int)$count_row['count'] + 1;

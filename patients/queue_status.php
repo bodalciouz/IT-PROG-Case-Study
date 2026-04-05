@@ -15,10 +15,8 @@ $user = mysqli_fetch_assoc($name_result);
 $query = "
     SELECT 
         q.queue_id,
-        q.queue_number,
         q.status AS queue_status,
         q.estimated_wait,
-        q.created_at,
         a.appointment_id,
         a.appointment_date,
         a.appointment_time,
@@ -28,7 +26,7 @@ $query = "
     JOIN appointments a ON q.appointment_id = a.appointment_id
     JOIN services s ON a.service_id = s.service_id
     WHERE a.patient_id = $patient_id
-    ORDER BY a.appointment_date ASC, a.appointment_time ASC, q.queue_number ASC
+    ORDER BY a.appointment_date ASC, a.appointment_time ASC, a.appointment_id ASC
 ";
 
 $result = mysqli_query($conn, $query); 
@@ -98,7 +96,18 @@ while ($row = mysqli_fetch_assoc($result)) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($queues as $q): 
+                            <?php
+                            $current_date = '';
+                            $queue_pos = 0;
+                            foreach ($queues as $q):
+                                // Reset queue number for new date
+                                if ($current_date !== $q['appointment_date']) {
+                                    $current_date = $q['appointment_date'];
+                                    $queue_pos = 1;
+                                } else {
+                                    $queue_pos++;
+                                }
+
                                 $appt_badge = match($q['appointment_status']) {
                                     'pending'   => 'bg-warning',
                                     'confirmed' => 'bg-primary',
@@ -121,9 +130,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <td><?= date('M j, Y', strtotime($q['appointment_date'])) ?></td>
                                     <td><?= date('g:i A', strtotime($q['appointment_time'])) ?></td>
                                     <td><?= htmlspecialchars($q['service_name']) ?></td>
-                                    <td>
-                                        <strong>#<?= $q['queue_number'] ?></strong>
-                                    </td>
+                                    <td><strong>#<?= $queue_pos ?></strong></td>
                                     <td><?= $q['estimated_wait'] ?> mins</td>
                                     <td>
                                         <span class="badge <?= $appt_badge ?>">
