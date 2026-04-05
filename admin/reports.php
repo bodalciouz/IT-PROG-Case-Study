@@ -114,7 +114,9 @@ $status_report = $status_report_stmt->get_result();
     </aside>
 
     <main class="main-content">
-        <h2>Operational Reports</h2>
+        <header class="top-bar">
+            <h2>Operational Reports</h2>
+        </header>
 
         <div class="content-card">
             <h3>Filter Report Range</h3>
@@ -214,6 +216,9 @@ $status_report = $status_report_stmt->get_result();
                 </tbody>
             </table>
         </div>
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 </div>
 
