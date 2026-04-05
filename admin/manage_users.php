@@ -110,7 +110,9 @@ $users = $conn->query("
     </aside>
 
     <main class="main-content">
-        <h2>Manage Users</h2>
+        <header class="top-bar">
+            <h2>Manage Users</h2>
+        </header>
 
         <div class="content-card">
             <h3>Add New User</h3>
@@ -207,6 +209,10 @@ $users = $conn->query("
                 </tbody>
             </table>
         </div>
+
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 
 </div>
