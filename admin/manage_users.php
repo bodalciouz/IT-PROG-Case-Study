@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     }
 }
 
-/* FETCH USERS WITH ROLE NAMES */
+
 $users = $conn->query("
     SELECT users.*, roles.role_name
     FROM users
