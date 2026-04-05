@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3307
--- Generation Time: Apr 05, 2026 at 11:52 AM
+-- Host: 127.0.0.1
+-- Generation Time: Apr 05, 2026 at 03:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,9 +42,6 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `appointment_date`, `appointment_time`, `status`, `created_at`) VALUES
-(34, 17, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:12:49'),
-(35, 17, 3, '2026-04-07', '13:16:00', 'missed', '2026-04-04 15:16:24'),
-(36, 18, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:17:40'),
 (37, 21, 2, '2026-04-06', '09:00:00', 'confirmed', '2026-04-05 09:51:44'),
 (38, 22, 10, '2026-04-06', '09:30:00', 'pending', '2026-04-05 09:51:44'),
 (39, 23, 5, '2026-04-06', '10:00:00', 'completed', '2026-04-05 09:51:44'),
@@ -78,9 +75,6 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`notification_id`, `user_id`, `appointment_id`, `type`, `message`, `created_at`) VALUES
-(10, 17, 34, 'appointment', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:12:49'),
-(11, 17, 35, 'appointment', 'Your appointment request for Digital Mammography on April 7, 2026 at 1:16 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:16:24'),
-(12, 18, 36, 'appointment', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:17:40'),
 (13, 21, 37, 'appointment', 'Your X-Ray appointment on April 6, 2026 at 9:00 AM has been confirmed.', '2026-04-05 09:51:44'),
 (14, 22, 38, 'appointment', 'Your Ultrasound appointment on April 6, 2026 at 9:30 AM has been submitted and is awaiting confirmation.', '2026-04-05 09:51:44'),
 (15, 23, 39, 'queue', 'Your ECG appointment on April 6, 2026 at 10:00 AM has been completed.', '2026-04-05 09:51:44'),
@@ -114,9 +108,6 @@ CREATE TABLE `queue` (
 --
 
 INSERT INTO `queue` (`queue_id`, `appointment_id`, `queue_number`, `status`, `estimated_wait`, `created_at`) VALUES
-(12, 34, 1, 'completed', 60, '2026-04-04 15:12:49'),
-(13, 35, 1, 'missed', 45, '2026-04-04 15:16:24'),
-(14, 36, 2, 'completed', 120, '2026-04-04 15:17:40'),
 (15, 37, 3, 'pending', 60, '2026-04-05 09:51:44'),
 (16, 38, 4, 'pending', 90, '2026-04-05 09:51:44'),
 (17, 39, 5, 'completed', 100, '2026-04-05 09:51:44'),
@@ -172,11 +163,9 @@ CREATE TABLE `schedules` (
 
 INSERT INTO `schedules` (`schedule_id`, `user_id`, `day_of_week`, `start_time`, `end_time`, `max_patients`, `created_at`) VALUES
 (1, 7, 'Monday', '11:00:00', '17:00:00', 11, '2026-03-31 07:40:26'),
-(2, 7, 'Friday', '15:18:00', '23:23:00', 12, '2026-04-04 15:18:39'),
 (3, 7, 'Tuesday', '09:00:00', '17:00:00', 10, '2026-04-05 09:51:44'),
 (4, 7, 'Wednesday', '09:00:00', '17:00:00', 10, '2026-04-05 09:51:44'),
 (5, 19, 'Monday', '08:00:00', '16:00:00', 8, '2026-04-05 09:51:44'),
-(6, 19, 'Thursday', '10:00:00', '18:00:00', 8, '2026-04-05 09:51:44'),
 (7, 20, 'Tuesday', '08:30:00', '15:30:00', 12, '2026-04-05 09:51:44'),
 (8, 20, 'Friday', '09:00:00', '17:00:00', 12, '2026-04-05 09:51:44');
 
