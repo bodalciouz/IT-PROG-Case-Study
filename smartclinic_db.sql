@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Apr 04, 2026 at 05:56 PM
+-- Generation Time: Apr 05, 2026 at 11:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,9 +42,21 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `appointment_date`, `appointment_time`, `status`, `created_at`) VALUES
-(34, 17, 4, '2026-04-06', '23:12:00', 'completed', '2026-04-04 15:12:49'),
+(34, 17, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:12:49'),
 (35, 17, 3, '2026-04-07', '13:16:00', 'missed', '2026-04-04 15:16:24'),
-(36, 18, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:17:40');
+(36, 18, 4, '2026-04-06', '23:12:00', 'pending', '2026-04-04 15:17:40'),
+(37, 21, 2, '2026-04-06', '09:00:00', 'confirmed', '2026-04-05 09:51:44'),
+(38, 22, 10, '2026-04-06', '09:30:00', 'pending', '2026-04-05 09:51:44'),
+(39, 23, 5, '2026-04-06', '10:00:00', 'completed', '2026-04-05 09:51:44'),
+(40, 24, 1, '2026-04-06', '10:30:00', 'pending', '2026-04-05 09:51:44'),
+(41, 25, 17, '2026-04-06', '11:00:00', 'cancelled', '2026-04-05 09:51:44'),
+(42, 26, 13, '2026-04-06', '11:30:00', 'missed', '2026-04-05 09:51:44'),
+(43, 21, 13, '2026-04-07', '09:00:00', 'confirmed', '2026-04-05 09:51:44'),
+(44, 22, 17, '2026-04-07', '09:30:00', 'pending', '2026-04-05 09:51:44'),
+(45, 23, 4, '2026-04-07', '10:00:00', 'ongoing', '2026-04-05 09:51:44'),
+(46, 24, 3, '2026-04-07', '10:30:00', 'completed', '2026-04-05 09:51:44'),
+(47, 25, 8, '2026-04-07', '11:00:00', 'pending', '2026-04-05 09:51:44'),
+(48, 26, 6, '2026-04-07', '11:30:00', 'confirmed', '2026-04-05 09:51:44');
 
 -- --------------------------------------------------------
 
@@ -66,9 +78,21 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`notification_id`, `user_id`, `appointment_id`, `type`, `message`, `created_at`) VALUES
-(10, 17, 34, '', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:12:49'),
-(11, 17, 35, '', 'Your appointment request for Digital Mammography on April 7, 2026 at 1:16 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:16:24'),
-(12, 18, 36, '', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:17:40');
+(10, 17, 34, 'appointment', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:12:49'),
+(11, 17, 35, 'appointment', 'Your appointment request for Digital Mammography on April 7, 2026 at 1:16 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:16:24'),
+(12, 18, 36, 'appointment', 'Your appointment request for CT-Scan on April 6, 2026 at 11:12 PM has been submitted and is awaiting confirmation.', '2026-04-04 15:17:40'),
+(13, 21, 37, 'appointment', 'Your X-Ray appointment on April 6, 2026 at 9:00 AM has been confirmed.', '2026-04-05 09:51:44'),
+(14, 22, 38, 'appointment', 'Your Ultrasound appointment on April 6, 2026 at 9:30 AM has been submitted and is awaiting confirmation.', '2026-04-05 09:51:44'),
+(15, 23, 39, 'queue', 'Your ECG appointment on April 6, 2026 at 10:00 AM has been completed.', '2026-04-05 09:51:44'),
+(16, 24, 40, 'appointment', 'Your Special Laboratory appointment on April 6, 2026 at 10:30 AM has been submitted and is awaiting confirmation.', '2026-04-05 09:51:44'),
+(17, 25, 41, 'appointment', 'Your Vaccination appointment on April 6, 2026 at 11:00 AM has been cancelled.', '2026-04-05 09:51:44'),
+(18, 26, 42, 'queue', 'You missed your Multi-Specialty Doctors Clinic appointment on April 6, 2026 at 11:30 AM.', '2026-04-05 09:51:44'),
+(19, 21, 43, 'appointment', 'Your Multi-Specialty Doctors Clinic appointment on April 7, 2026 at 9:00 AM has been confirmed.', '2026-04-05 09:51:44'),
+(20, 22, 44, 'appointment', 'Your Vaccination appointment on April 7, 2026 at 9:30 AM has been submitted and is awaiting confirmation.', '2026-04-05 09:51:44'),
+(21, 23, 45, 'queue', 'Your CT-Scan appointment on April 7, 2026 at 10:00 AM is now ongoing.', '2026-04-05 09:51:44'),
+(22, 24, 46, 'queue', 'Your Digital Mammography appointment on April 7, 2026 at 10:30 AM has been completed.', '2026-04-05 09:51:44'),
+(23, 25, 47, 'appointment', 'Your Ambulatory Blood Pressure Monitoring appointment on April 7, 2026 at 11:00 AM has been submitted and is awaiting confirmation.', '2026-04-05 09:51:44'),
+(24, 26, 48, 'appointment', 'Your ICG Echocardiography appointment on April 7, 2026 at 11:30 AM has been confirmed.', '2026-04-05 09:51:44');
 
 -- --------------------------------------------------------
 
@@ -92,7 +116,19 @@ CREATE TABLE `queue` (
 INSERT INTO `queue` (`queue_id`, `appointment_id`, `queue_number`, `status`, `estimated_wait`, `created_at`) VALUES
 (12, 34, 1, 'completed', 60, '2026-04-04 15:12:49'),
 (13, 35, 1, 'missed', 45, '2026-04-04 15:16:24'),
-(14, 36, 2, 'pending', 120, '2026-04-04 15:17:40');
+(14, 36, 2, 'completed', 120, '2026-04-04 15:17:40'),
+(15, 37, 3, 'pending', 60, '2026-04-05 09:51:44'),
+(16, 38, 4, 'pending', 90, '2026-04-05 09:51:44'),
+(17, 39, 5, 'completed', 100, '2026-04-05 09:51:44'),
+(18, 40, 6, 'pending', 150, '2026-04-05 09:51:44'),
+(19, 41, 7, 'cancelled', 420, '2026-04-05 09:51:44'),
+(20, 42, 8, 'missed', 240, '2026-04-05 09:51:44'),
+(21, 43, 2, 'pending', 30, '2026-04-05 09:51:44'),
+(22, 44, 3, 'pending', 45, '2026-04-05 09:51:44'),
+(23, 45, 4, 'ongoing', 180, '2026-04-05 09:51:44'),
+(24, 46, 5, 'completed', 225, '2026-04-05 09:51:44'),
+(25, 47, 6, 'pending', 180, '2026-04-05 09:51:44'),
+(26, 48, 7, 'pending', 270, '2026-04-05 09:51:44');
 
 -- --------------------------------------------------------
 
@@ -135,8 +171,14 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `user_id`, `day_of_week`, `start_time`, `end_time`, `max_patients`, `created_at`) VALUES
-(1, 7, 'Monday', '09:00:00', '17:00:00', 10, '2026-03-31 07:40:26'),
-(2, 7, 'Friday', '15:18:00', '23:23:00', 12, '2026-04-04 15:18:39');
+(1, 7, 'Monday', '11:00:00', '17:00:00', 11, '2026-03-31 07:40:26'),
+(2, 7, 'Friday', '15:18:00', '23:23:00', 12, '2026-04-04 15:18:39'),
+(3, 7, 'Tuesday', '09:00:00', '17:00:00', 10, '2026-04-05 09:51:44'),
+(4, 7, 'Wednesday', '09:00:00', '17:00:00', 10, '2026-04-05 09:51:44'),
+(5, 19, 'Monday', '08:00:00', '16:00:00', 8, '2026-04-05 09:51:44'),
+(6, 19, 'Thursday', '10:00:00', '18:00:00', 8, '2026-04-05 09:51:44'),
+(7, 20, 'Tuesday', '08:30:00', '15:30:00', 12, '2026-04-05 09:51:44'),
+(8, 20, 'Friday', '09:00:00', '17:00:00', 12, '2026-04-05 09:51:44');
 
 -- --------------------------------------------------------
 
@@ -202,7 +244,15 @@ INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `
 (14, 3, 'Angelo', 'Benigno', 'oleg@gmail.com', '$2y$10$VGNIyen85QeyzkIBGa4lF.DOmCY.3vvShGQOd79CyNXFpmmI1RyJu', '012345678', 'Caloocan', '2026-03-31 09:41:50'),
 (16, 3, 'ako', 'lang', 'akolangba@gmail.com', '$2y$10$.DxgOTdKJHN.QXpZp6Ax4.yqYPcJjOGb7CyDpa39fbWk/gSoSd5Ti', '0922 727 1919', 'Manila', '2026-04-01 12:25:26'),
 (17, 3, 'john', 'doe', 'john@yahoo.com', '$2y$10$NsXoMzFg9n9zg/PwZkNDqOAA4ixXjpox7Nmb35wrEQjamfGrfkvUW', '091241234', 'john house', '2026-04-04 15:11:49'),
-(18, 3, 'jane', 'doe', 'jane@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '', '', '2026-04-04 15:12:05');
+(18, 3, 'jane', 'doe', 'jane@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '', '', '2026-04-04 15:12:05'),
+(19, 2, 'Maria', 'Santos', 'maria.santos@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09170000001', 'Staff Office A', '2026-04-05 09:51:44'),
+(20, 2, 'Paolo', 'Reyes', 'paolo.reyes@smartclinic.com', '$2y$10$46DI89ujwBaSsXkDGmXxte9X6y4yaqnpnCHMIXV6KMuSZ6gtbRjMS', '09170000002', 'Staff Office B', '2026-04-05 09:51:44'),
+(21, 3, 'Mark', 'Dela Cruz', 'mark.delacruz@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09181234567', 'Quezon City', '2026-04-05 09:51:44'),
+(22, 3, 'Angela', 'Torres', 'angela.torres@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09182345678', 'Makati City', '2026-04-05 09:51:44'),
+(23, 3, 'Kevin', 'Lim', 'kevin.lim@yahoo.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09183456789', 'Pasig City', '2026-04-05 09:51:44'),
+(24, 3, 'Sofia', 'Navarro', 'sofia.navarro@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09184567890', 'Taguig City', '2026-04-05 09:51:44'),
+(25, 3, 'Luis', 'Garcia', 'luis.garcia@gmail.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09185678901', 'Mandaluyong City', '2026-04-05 09:51:44'),
+(26, 3, 'Bea', 'Fernandez', 'bea.fernandez@yahoo.com', '$2y$10$PDC4Vm0jk/lnrThA3e/lJePhlMiHlgHgjrd1d9NbucBZXcz7M0O3C', '09186789012', 'San Juan City', '2026-04-05 09:51:44');
 
 --
 -- Indexes for dumped tables
@@ -269,19 +319,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for appointments', AUTO_INCREMENT=37;
+  MODIFY `appointment_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for appointments', AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for notifications', AUTO_INCREMENT=13;
+  MODIFY `notification_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for notifications', AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `queue`
 --
 ALTER TABLE `queue`
-  MODIFY `queue_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for queue', AUTO_INCREMENT=15;
+  MODIFY `queue_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for queue', AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -293,7 +343,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for schedules', AUTO_INCREMENT=3;
+  MODIFY `schedule_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for schedules', AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -305,7 +355,7 @@ ALTER TABLE `services`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for users', AUTO_INCREMENT=19;
+  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK for users', AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
