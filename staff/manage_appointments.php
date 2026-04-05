@@ -5,7 +5,7 @@ checkRole(2);
 
 require_once '../config/database.php';
 
-// UPDATE
+// UPDATE STATUS
 if(isset($_POST['update_status'])){
     $id = $_POST['appointment_id'];
     $status = $_POST['status'];
@@ -15,7 +15,6 @@ if(isset($_POST['update_status'])){
     $stmt->execute();
 }
 
-// QUERY
 $query = "
 SELECT a.*, u.first_name, u.last_name, s.service_name
 FROM appointments a
@@ -28,57 +27,79 @@ $result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="../assets/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Appointments - SmartClinic</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-
 <body class="dashboard-page">
 
 <div class="app-container">
 
-<?php include 'sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
 
-<div class="main-content">
+    <main class="main-content">
+        <header class="top-bar">
+            <h2>Manage Appointments</h2>
+        </header>
 
-<div class="top-bar"><h2>Appointments</h2></div>
+        <section class="dashboard">
+            <div class="dashboard-header">
+                <h3>Appointments</h3>
+                <p>View and update patient appointment statuses.</p>
+            </div>
 
-<div class="content-card">
+            <div class="content-card">
+                <?php if($result->num_rows > 0): ?>
+                <div class="table-wrapper">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['first_name'] . " " . $row['last_name']) ?></td>
+                                <td><?= htmlspecialchars($row['service_name']) ?></td>
+                                <td><?= htmlspecialchars($row['appointment_date']) ?></td>
+                                <td><?= htmlspecialchars($row['status']) ?></td>
+                                <td>
+                                    <form method="POST" class="update-form">
+                                        <input type="hidden" name="appointment_id" value="<?= $row['appointment_id'] ?>">
+                                        <select name="status" required>
+                                            <option <?= $row['status'] === 'pending' ? 'selected' : '' ?>>pending</option>
+                                            <option <?= $row['status'] === 'confirmed' ? 'selected' : '' ?>>confirmed</option>
+                                            <option <?= $row['status'] === 'completed' ? 'selected' : '' ?>>completed</option>
+                                            <option <?= $row['status'] === 'missed' ? 'selected' : '' ?>>missed</option>
+                                        </select>
+                                        <button type="submit" name="update_status" class="update-btn">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php else: ?>
+                    <div class="no-data"><p>No appointments found.</p></div>
+                <?php endif; ?>
+            </div>
 
-<table class="data-table">
-<tr>
-<th>Patient</th>
-<th>Service</th>
-<th>Date</th>
-<th>Status</th>
-<th>Update</th>
-</tr>
+        </section>
 
-<?php while($row = $result->fetch_assoc()): ?>
-<tr>
-<td><?= $row['first_name']." ".$row['last_name'] ?></td>
-<td><?= $row['service_name'] ?></td>
-<td><?= $row['appointment_date'] ?></td>
-<td><?= $row['status'] ?></td>
-<td>
-<form method="POST">
-<input type="hidden" name="appointment_id" value="<?= $row['appointment_id'] ?>">
-<select name="status">
-<option>pending</option>
-<option>confirmed</option>
-<option>completed</option>
-<option>missed</option>
-</select>
-<button name="update_status">Update</button>
-</form>
-</td>
-</tr>
-<?php endwhile; ?>
-
-</table>
-
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
+    </main>
 </div>
-</div>
-</div>
+
 </body>
 </html>
