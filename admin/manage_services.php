@@ -92,7 +92,9 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
     </aside>
 
     <main class="main-content">
-        <h2>Manage Services</h2>
+        <header class="top-bar">
+            <h2>Manage Services</h2>
+        </header>
 
         <div class="content-card">
             <h3>Add Service</h3>
@@ -161,6 +163,9 @@ $services = $conn->query("SELECT * FROM services ORDER BY service_id ASC");
                 </tbody>
             </table>
         </div>
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 </div>
 
