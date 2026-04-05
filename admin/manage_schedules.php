@@ -137,7 +137,9 @@ $schedules = $conn->query("
     </aside>
 
     <main class="main-content">
-        <h2>Manage Staff Schedules</h2>
+        <header class="top-bar">
+            <h2>Manage Staff Schedules</h2>
+        </header>
 
         <div class="content-card">
             <h3>Add Schedule</h3>
@@ -195,6 +197,7 @@ $schedules = $conn->query("
         <div class="content-card">
             <h3>All Staff Schedules</h3>
 
+            <div class="table-responsive">
             <table class="styled-table">
                 <thead>
                     <tr>
@@ -268,6 +271,10 @@ $schedules = $conn->query("
                 </tbody>
             </table>
         </div>
+    </div>
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 </div>
 
