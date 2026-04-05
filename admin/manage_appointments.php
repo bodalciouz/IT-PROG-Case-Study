@@ -99,8 +99,11 @@ if (!empty($filter_date)) {
     </aside>
 
     <main class="main-content">
-        <h2>Manage Appointments</h2>
-
+        
+        <header class="top-bar">
+            <h2>Manage Appointments</h2>
+        </header>
+        
         <div class="content-card">
             <h3>Filter by Date</h3>
             <form method="GET" class="crud-form">
@@ -165,6 +168,9 @@ if (!empty($filter_date)) {
                 </tbody>
             </table>
         </div>
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 </div>
 
