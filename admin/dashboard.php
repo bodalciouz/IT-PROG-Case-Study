@@ -164,6 +164,5 @@ $recent_appointments = $conn->query("
         </footer>
     </main>
 </div>
-
 </body>
 </html>
