@@ -5,11 +5,8 @@ $newPassword = "demo123";
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
 $emails = [
-    'admin@smartclinic.com',
-    'staff@smartclinic.com',
     'maria.santos@smartclinic.com',
     'paolo.reyes@smartclinic.com',
-    'carl_crespo@dlsu.edu.ph',
     'oleg@gmail.com',
     'akolangba@gmail.com',
     'john@yahoo.com',
