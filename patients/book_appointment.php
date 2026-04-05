@@ -7,89 +7,176 @@ require_once '../config/database.php';
 
 $patient_id = $_SESSION['user_id'];
 
-// Fetch the first name of the user
 $name_result = mysqli_query($conn, "SELECT first_name FROM users WHERE user_id = $patient_id");
 $user = mysqli_fetch_assoc($name_result);
 
 $message = "";
 
-// Handle Appointment Booking
+$clinic_start = '08:00';
+$clinic_end   = '17:00';
+$clinic_step  = 30;
+$allowed_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $service_id = (int)$_POST['service_id'];
-    $date       = mysqli_real_escape_string($conn, $_POST['appointment_date']);
-    $time       = mysqli_real_escape_string($conn, $_POST['appointment_time']);
+    $date       = $_POST['appointment_date'];
+    $time       = $_POST['appointment_time'];
 
-    // Step 1: Insert the appointment
-    $stmt = mysqli_prepare($conn, "
-        INSERT INTO appointments (patient_id, service_id, appointment_date, appointment_time, status)
-        VALUES (?, ?, ?, ?, 'pending')
+    $errors = [];
+
+    $date_obj = DateTime::createFromFormat('Y-m-d', $date);
+    if (!$date_obj || $date_obj->format('Y-m-d') !== $date) {
+        $errors[] = "Invalid date format.";
+    }
+
+    $time_obj = DateTime::createFromFormat('H:i', $time);
+    if (!$time_obj || $time_obj->format('H:i') !== $time) {
+        $errors[] = "Invalid time format.";
+    }
+
+    $day_of_week = date('l', strtotime($date));
+    if (!in_array($day_of_week, $allowed_days)) {
+        $errors[] = "Appointments allowed only Monday to Friday.";
+    }
+
+    $time_ts  = strtotime($time);
+    if ($time_ts < strtotime($clinic_start) || $time_ts > strtotime($clinic_end)) {
+        $errors[] = "Time must be within clinic hours ($clinic_start - $clinic_end).";
+    }
+
+    if ((int)date('i', $time_ts) % $clinic_step !== 0) {
+        $errors[] = "Time must follow {$clinic_step}-minute intervals.";
+    }
+
+    $svc = mysqli_query($conn, "SELECT * FROM services WHERE service_id = $service_id");
+    if (mysqli_num_rows($svc) === 0) {
+        $errors[] = "Invalid service.";
+    } else {
+        $svc_row = mysqli_fetch_assoc($svc);
+        $service_name = $svc_row['service_name'];
+        $duration = $svc_row['estimated_duration'];
+    }
+
+    $dup = mysqli_query($conn, "
+        SELECT * FROM appointments 
+        WHERE patient_id = $patient_id
+        AND appointment_date = '$date'
+        AND appointment_time = '$time'
     ");
-    mysqli_stmt_bind_param($stmt, "iiss", $patient_id, $service_id, $date, $time);
+    if (mysqli_num_rows($dup) > 0) {
+        $errors[] = "You already booked this time.";
+    }
 
-    if (mysqli_stmt_execute($stmt)) {
-        $appointment_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
+    if (empty($errors)) {
 
-        // Step 2: Queue based on appointment time  
-        $count_result = mysqli_query($conn, "
-            SELECT COUNT(*) AS count
-            FROM queue q
-            JOIN appointments a ON q.appointment_id = a.appointment_id
-            WHERE a.appointment_date = '$date'
-            AND (
-                a.appointment_time < '$time'
-                OR (a.appointment_time = '$time' AND a.appointment_id < $appointment_id)
-            )
+        $schedule_query = mysqli_query($conn, "
+            SELECT * FROM schedules
+            WHERE day_of_week = '$day_of_week'
+            AND start_time <= '$time'
+            AND end_time >= '$time'
         ");
-        $count_row    = mysqli_fetch_assoc($count_result);
-        $queue_number = (int)$count_row['count'] + 1;
 
-        // Step 3: Get estimated duration for the service
-        $svc_result = mysqli_query($conn, "
-            SELECT service_name, estimated_duration FROM services WHERE service_id = $service_id
+        if (mysqli_num_rows($schedule_query) === 0) {
+            $errors[] = "No staff available at selected time.";
+        } else {
+
+            $schedule_row = mysqli_fetch_assoc($schedule_query);
+            $max_patients = $schedule_row['max_patients'];
+
+            $count_query = mysqli_query($conn, "
+                SELECT COUNT(*) as total
+                FROM appointments
+                WHERE appointment_date = '$date'
+                AND appointment_time = '$time'
+                AND status != 'cancelled'
+            ");
+
+            $count_row = mysqli_fetch_assoc($count_query);
+
+            if ($count_row['total'] >= $max_patients) {
+                $errors[] = "This time slot is already full.";
+            }
+        }
+    }
+
+    if (empty($errors)) {
+
+        $stmt = mysqli_prepare($conn, "
+            INSERT INTO appointments (patient_id, service_id, appointment_date, appointment_time, status)
+            VALUES (?, ?, ?, ?, 'pending')
         ");
-        $svc_row      = mysqli_fetch_assoc($svc_result);
-        $duration     = isset($svc_row['estimated_duration']) ? (int)$svc_row['estimated_duration'] : 30;
-        $est_wait     = $queue_number * $duration;
-        $service_name = $svc_row['service_name'] ?? 'your service';
+        mysqli_stmt_bind_param($stmt, "iiss", $patient_id, $service_id, $date, $time);
 
-        // Step 4: Insert into queue
-        $q_stmt = mysqli_prepare($conn, "
-            INSERT INTO queue (appointment_id, queue_number, status, estimated_wait, created_at)
-            VALUES (?, ?, 'pending', ?, NOW())
-        ");
-        mysqli_stmt_bind_param($q_stmt, "iii", $appointment_id, $queue_number, $est_wait);
+        if (mysqli_stmt_execute($stmt)) {
 
-        if (mysqli_stmt_execute($q_stmt)) {
+            $appointment_id = mysqli_insert_id($conn);
+            mysqli_stmt_close($stmt);
+
+            // Insert queue
+            $q_stmt = mysqli_prepare($conn, "
+                INSERT INTO queue (appointment_id, queue_number, status, estimated_wait, created_at)
+                VALUES (?, 0, 'pending', 0, NOW())
+            ");
+            mysqli_stmt_bind_param($q_stmt, "i", $appointment_id);
+            mysqli_stmt_execute($q_stmt);
             mysqli_stmt_close($q_stmt);
 
-            // Step 5: Insert booking submission notification
+            $queues = mysqli_query($conn, "
+                SELECT q.queue_id, a.service_id
+                FROM queue q
+                JOIN appointments a ON q.appointment_id = a.appointment_id
+                WHERE a.appointment_date = '$date'
+                ORDER BY a.appointment_time ASC, a.appointment_id ASC
+            ");
+
+            $pos = 1;
+            while ($row = mysqli_fetch_assoc($queues)) {
+
+                $qid = $row['queue_id'];
+                $sid = $row['service_id'];
+
+                $dur_res = mysqli_query($conn, "
+                    SELECT estimated_duration FROM services WHERE service_id = $sid
+                ");
+                $dur_row = mysqli_fetch_assoc($dur_res);
+                $dur = $dur_row['estimated_duration'] ?? 30;
+
+                $wait = ($pos - 1) * $dur;
+
+                mysqli_query($conn, "
+                    UPDATE queue 
+                    SET queue_number = $pos, estimated_wait = $wait
+                    WHERE queue_id = $qid
+                ");
+
+                $pos++;
+            }
+
             $formatted_date = date('F j, Y', strtotime($date));
             $formatted_time = date('g:i A', strtotime($time));
-            $notif_message  = "Your appointment request for {$service_name} on {$formatted_date} at {$formatted_time} has been submitted and is awaiting confirmation.";
-            $notif_type     = "booking_submitted";
 
-            $n_stmt = mysqli_prepare($conn, "
-                INSERT INTO notifications (user_id, appointment_id, type, message, created_at)
-                VALUES (?, ?, ?, ?, NOW())
+            $msg = "Your appointment for {$service_name} on {$formatted_date} at {$formatted_time} has been submitted.";
+
+            $notif = mysqli_prepare($conn, "
+                INSERT INTO notifications (user_id, appointment_id, type, message)
+                VALUES (?, ?, 'appointment', ?)
             ");
-            mysqli_stmt_bind_param($n_stmt, "iiss", $patient_id, $appointment_id, $notif_type, $notif_message);
-            mysqli_stmt_execute($n_stmt);
-            mysqli_stmt_close($n_stmt);
+            mysqli_stmt_bind_param($notif, "iis", $patient_id, $appointment_id, $msg);
+            mysqli_stmt_execute($notif);
+            mysqli_stmt_close($notif);
 
-            $message = '<div class="alert success">Appointment booked successfully! You are #' . $queue_number . ' in the queue.</div>';
+            $message = "<div class='alert success'>Appointment booked successfully!</div>";
+
         } else {
-            $message = '<div class="alert error">Appointment saved but queue entry failed: ' . htmlspecialchars(mysqli_stmt_error($q_stmt)) . '</div>';
-            mysqli_stmt_close($q_stmt);
+            $message = "<div class='alert error'>Booking failed.</div>";
         }
 
     } else {
-        $message = '<div class="alert error">Failed to book appointment: ' . htmlspecialchars(mysqli_stmt_error($stmt)) . '</div>';
-        mysqli_stmt_close($stmt);
+        $message = "<div class='alert error'>" . implode("<br>", $errors) . "</div>";
     }
 }
 
-// Fetch services
 $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_name ASC");
 ?>
 
@@ -102,7 +189,6 @@ $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body class="dashboard-page">
-
 <div class="app-container">
 
     <aside class="sidebar">
@@ -137,7 +223,6 @@ $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_
             <?= $message ?>
 
             <form method="POST" class="crud-form">
-
                 <div class="form-group-profile">
                     <label>Select Service</label>
                     <select name="service_id" required>
@@ -157,14 +242,17 @@ $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_
 
                 <div class="form-group-profile">
                     <label>Preferred Time</label>
-                    <input type="time" name="appointment_time" required>
+                    <input type="time" name="appointment_time"
+                           min="<?= $clinic_start ?>"
+                           max="<?= $clinic_end ?>"
+                           step="<?= $clinic_step * 60 ?>"
+                           required>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button type="submit" class="update-btn">Confirm Booking</button>
                     <a href="dashboard.php" class="delete-btn" style="display:inline-block; text-align:center; line-height:normal; padding:10px 20px;">Cancel</a>
                 </div>
-
             </form>
         </section>
 
@@ -172,8 +260,6 @@ $services_result = mysqli_query($conn, "SELECT * FROM services ORDER BY service_
             SmartClinic © 2026. All Rights Reserved
         </footer>
     </main>
-
 </div>
-
 </body>
-</html>
+</html> 
