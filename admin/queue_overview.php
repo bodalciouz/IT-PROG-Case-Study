@@ -96,7 +96,9 @@ $missed_count = $missed_result->get_result()->fetch_assoc()['total'];
     </aside>
 
     <main class="main-content">
-        <h2>Queue Overview</h2>
+        <header class="top-bar">
+            <h2>Queue Overview</h2>
+        </header>
 
         <div class="content-card">
             <h3>Select Date</h3>
@@ -162,6 +164,9 @@ $missed_count = $missed_result->get_result()->fetch_assoc()['total'];
                 </tbody>
             </table>
         </div>
+        <footer class="footer">
+            SmartClinic © 2026. All Rights Reserved
+        </footer>
     </main>
 </div>
 
